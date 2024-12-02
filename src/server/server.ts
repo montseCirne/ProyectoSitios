@@ -1,45 +1,43 @@
-import { createServer } from "http";
-import express, { Express } from "express";
-import httpProxy from "http-proxy";
-import helmet from "helmet";
+import express from 'express';
 import path from 'path';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import passport from 'passport';
+import session from 'express-session';
 
-const port = 5000;
-const expressApp: Express = express();
-const proxy = httpProxy.createProxyServer({
-    target: "http://localhost:5100", ws: true
-});
+const app = express();
+const port = process.env.PORT || 3000;
 
-expressApp.use(express.urlencoded({ extended: true }));
-//express busca  archivos de plantilla en esa carpeta
-expressApp.set("views", "templates/server");
-//se usa el motor de plantillas "handlebars"
-expressApp.set("view engine", "handlebars");
+// Configuración de la vista (Handlebars)
+app.set('views', path.join(__dirname, 'templates'));
+app.set('view engine', 'handlebars');
 
-expressApp.use(helmet());
-expressApp.use(express.json());
-// Configura express-session
-expressApp.use(express.static("static"));
-//static file
-expressApp.use(express.static('src/client'));
-expressApp.get('/src/client/reserve.js', (req, res) => {//tipos MIME
-    res.type('application/javascript');
-    res.sendFile(path.join(__dirname, 'src/client/reserve.js'));
-});
-//scripts externos
-expressApp.use((req, res, next) => {
-    res.setHeader(
-        "Content-Security-Policy",
-        "script-src 'self';"
-    );
+// Middleware
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'static')));
+
+app.use(session({
+    secret: 'secret-key',
+    resave: false,
+    saveUninitialized: true,
+}));
+
+// Inicialización de Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// Sin sesión de usuario redirige al login
+app.get('*', (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.redirect('/auth/login');
+    }
     next();
 });
 
-expressApp.use(express.static("node_modules/bootstrap/dist"));
-//use agrega middleware redirige req a la url de target, no Sockets
-expressApp.use("^/$", (req, resp) => resp.redirect("/loggin"));
-expressApp.use((req, resp) => proxy.web(req, resp));
-const server = createServer(expressApp);
-//se activa una req de upgrade, redirecciona a webSockets
-server.on('upgrade', (req, socket, head) => proxy.ws(req, socket, head));
-server.listen(port, () => console.log(`HTTP Server listening on http://localhost:${port}`));
+// Arranque del servidor
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
