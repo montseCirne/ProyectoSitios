@@ -18,6 +18,7 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.4"
+    "@tsconfig/node20": "^20.1.4",
+    "@types/express": "^5.0.0"
   }
 }
