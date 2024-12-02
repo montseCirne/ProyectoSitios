@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
-    "@types/express": "^5.0.0"
+    "@types/express": "^5.0.0",
+    "@types/http-proxy": "^1.17.15"
   }
 }
