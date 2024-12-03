@@ -31,7 +31,7 @@ export interface AuthStore {
 }  
 
 export interface AuthenticatedRequest extends Request {
-  user?: Usuario; // Usuario autenticado basado en tu interfaz
+  user?: Usuario;  // Usuario autenticado basado en tu interfaz
   isAuthenticated: () => boolean; // Método de Passport
   logout: (callback: (err: any) => void) => void; // Método logout de Passport
 }
