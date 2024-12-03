@@ -62,7 +62,7 @@ ComandaModel.init({
 }, {
     sequelize: orm_auth_store_1.sequelize,
     modelName: 'Comanda',
-    tableName: 'comandas',
+    tableName: 'Comandas',
     timestamps: true,
 });
 // Relaciones
@@ -73,7 +73,7 @@ ComandaModel.belongsTo(UsuarioModel, { foreignKey: 'meseroId', as: 'mesero' });
 // Sincronización
 const initModels = async () => {
     try {
-        await orm_auth_store_1.sequelize.sync({ force: true }); // Usa "true" solo para desarrollo
+        await orm_auth_store_1.sequelize.sync();
         console.log('Modelos sincronizados con la base de datos.');
     }
     catch (error) {
