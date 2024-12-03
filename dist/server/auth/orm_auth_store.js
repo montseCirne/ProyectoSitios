@@ -4,8 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthStore = exports.Comanda = exports.Mesa = exports.Usuario = exports.sequelize = void 0;
-const sequelize_1 = require("sequelize");
+const orm_auth_models_1 = require("./orm_auth_models");
+const orm_auth_models_2 = require("./orm_auth_models");
+const orm_auth_models_3 = require("./orm_auth_models");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const sequelize_1 = require("sequelize");
 // Configuración de la base de datos
 exports.sequelize = new sequelize_1.Sequelize({
     dialect: 'sqlite',
@@ -13,39 +16,11 @@ exports.sequelize = new sequelize_1.Sequelize({
     logging: console.log,
 });
 // Modelo de Usuario
-exports.Usuario = exports.sequelize.define('Usuario', {
-    nombre: sequelize_1.DataTypes.STRING,
-    correo: sequelize_1.DataTypes.STRING,
-    contraseña: sequelize_1.DataTypes.STRING,
-    rol: sequelize_1.DataTypes.ENUM('mesero', 'cocinero', 'administrador'),
-});
+exports.Usuario = orm_auth_models_3.UsuarioModel;
 // Modelo de Mesa
-exports.Mesa = exports.sequelize.define('Mesa', {
-    numero: sequelize_1.DataTypes.INTEGER,
-    estado: sequelize_1.DataTypes.ENUM('disponible', 'ocupada'),
-});
+exports.Mesa = orm_auth_models_1.MesaModel;
 // Modelo de Comanda
-exports.Comanda = exports.sequelize.define('Comanda', {
-    idMesa: {
-        type: sequelize_1.DataTypes.INTEGER,
-        references: {
-            model: exports.Mesa,
-            key: 'id',
-        },
-    },
-    platillos: sequelize_1.DataTypes.JSON,
-    bebidas: sequelize_1.DataTypes.JSON,
-    notas: sequelize_1.DataTypes.STRING,
-    estado: sequelize_1.DataTypes.ENUM('pendiente', 'en preparación', 'listo'),
-    meseroId: {
-        type: sequelize_1.DataTypes.INTEGER,
-        references: {
-            model: exports.Usuario,
-            key: 'id',
-        },
-        onDelete: 'CASCADE',
-    },
-});
+exports.Comanda = orm_auth_models_2.ComandaModel;
 class AuthStore {
     // Crear o actualizar usuario
     async storeOrUpdateUser(nombre, correo, contraseña, rol) {
@@ -77,8 +52,21 @@ class AuthStore {
     async listTables() {
         return await exports.Mesa.findAll();
     }
+    // Listar mesas ocupadas
+    async listOccupiedTables() {
+        return await exports.Mesa.findAll({
+            where: {
+                estado: 'ocupada',
+            }
+        });
+    }
     // Crear o actualizar una comanda
     async storeOrUpdateComanda(idMesa, meseroId, platillos, bebidas, notas, estado) {
+        const mesa = await exports.Mesa.findByPk(idMesa);
+        if (!mesa || mesa.estado === 'ocupada') {
+            throw new Error('Mesa no disponible o ya ocupada');
+        }
+        // Registrar comanda y actualizar estado de mesa
         await exports.Comanda.upsert({
             idMesa,
             meseroId,
@@ -87,10 +75,25 @@ class AuthStore {
             notas,
             estado,
         });
+        // Actualizar estado de la mesa a ocupada
+        await mesa.update({ estado: 'ocupada' });
     }
     // Eliminar una comanda
     async deleteComanda(id) {
         try {
+            const comanda = await exports.Comanda.findByPk(id);
+            if (!comanda) {
+                throw new Error('Comanda no encontrada');
+            }
+            // Comprobación de la existencia de la mesa antes de acceder a sus propiedades
+            const mesa = await exports.Mesa.findByPk(comanda.idMesa);
+            if (mesa) {
+                await mesa.update({ estado: 'disponible' });
+            }
+            else {
+                throw new Error('Mesa no encontrada');
+            }
+            // Eliminar la comanda
             await exports.Comanda.destroy({ where: { id } });
         }
         catch (error) {
@@ -116,7 +119,11 @@ class AuthStore {
                 defaultTables.push(this.storeOrUpdateTable(i, 'disponible'));
             }
             await Promise.all(defaultTables);
-            console.log('Base de datos inicializada con usuarios y mesas por defecto.');
+            // Inicialización de comandas por defecto
+            const defaultComandas = [];
+            defaultComandas.push(this.storeOrUpdateComanda(1, 1, ['Ensalada César'], ['Agua'], 'Sin notas', 'pendiente'), this.storeOrUpdateComanda(2, 1, ['Pizza Margherita'], ['Cerveza'], 'Sin notas', 'pendiente'), this.storeOrUpdateComanda(3, 1, ['Pasta Bolognesa'], ['Vino Tinto'], 'Sin notas', 'pendiente'));
+            await Promise.all(defaultComandas);
+            console.log('Base de datos inicializada con usuarios, mesas y comandas por defecto.');
         }
         catch (error) {
             console.error('Error al sincronizar o inicializar la base de datos:', error);

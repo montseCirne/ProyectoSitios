@@ -1,6 +1,6 @@
-import { MesaModel } from './orm_auth_models'; // Asegúrate de importar el modelo correcto
-import { ComandaModel } from './orm_auth_models'; // Asegúrate de importar el modelo correcto
-import { UsuarioModel } from './orm_auth_models'; // Asegúrate de importar el modelo correcto
+import { MesaModel } from './orm_auth_models'; 
+import { ComandaModel } from './orm_auth_models'; 
+import { UsuarioModel } from './orm_auth_models';
 import bcrypt from 'bcrypt';
 import { Sequelize, DataTypes } from 'sequelize';
 
@@ -36,6 +36,7 @@ export class AuthStore {
       rol,
     });
   }
+  
 
   // Eliminar un usuario
   async deleteUser(correo: string): Promise<void> {
