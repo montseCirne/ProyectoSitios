@@ -1,71 +1,72 @@
-import { Router } from 'express';
-import { isAuthenticated } from './auth/passport_config';  // Middleware de autenticación
-import { authorize } from './auth/passport_config'; // Middleware de autorización basado en rol
-import { Usuario } from './auth/auth_types';  // Importando la interfaz Usuario
+import { Express } from "express";
+import passport from "passport";
+import { isAuthenticated } from "./auth/passport_config"; // Importar isAuthenticated para proteger las rutas
 
-const router = Router();
+function obtenerRol(req: any): string | undefined {
+  return req.user ? req.user.rol : undefined;
+}
 
-// Redirigir a login si no está autenticado
-router.get("^/$", (req, res) => {
-  if (req.isAuthenticated()) {
-    const usuario = req.user as Usuario;
-    // Si el usuario está autenticado, redirigir a su dashboard según su rol
-    switch (usuario.rol) {
-      case 'administrador':
-        res.redirect('/admin');
-        break;
-      case 'cocinero':
-        res.redirect('/cocinero');
-        break;
-      case 'mesero':
-        res.redirect('/mesero');
-        break;
-      default:
-        res.redirect('/login');  // Si el rol no está definido, redirigir al login
+export function registerFormRoutesUser(app: Express) {
+  // Ruta para el formulario de login
+  app.get("/login", (req, res) => {
+    res.render("login");
+  });
+
+  // Ruta para procesar el login
+  app.post("/login", passport.authenticate("local", {
+    successRedirect: "/redirect",  // Redirige a la ruta '/redirect' después del login exitoso
+    failureRedirect: "/login",     // Redirige al login si falla
+    failureFlash: true
+  }));
+
+  // Ruta para redirigir según el rol del usuario
+  app.get("/redirect", (req, res) => {
+    const rol = obtenerRol(req);  // Obtener el rol del usuario autenticado
+    if (rol) {
+      // Redirige según el rol del usuario
+      switch (rol) {
+        case 'administrador':
+          res.redirect('/admin');
+          break;
+        case 'mesero':
+          res.redirect('/mesero');
+          break;
+        case 'cocinero':
+          res.redirect('/cocinero');
+          break;
+        default:
+          res.redirect('/login');  // Si no tiene rol o hay un error
+      }
+    } else {
+      res.redirect('/login');  // Si no hay usuario autenticado
     }
-  } else {
-    res.redirect('/login');  // Si no está autenticado, redirigir al login
-  }
-});
+  });
 
-// Ruta para el login
-router.get('/login', (req, res) => {
-  res.render('login');  // Asegúrate de tener una vista de login en tu carpeta de plantillas
-});
+  // Rutas para los menús, accesibles solo para usuarios autenticados y con el rol adecuado
+  app.get("/admin", isAuthenticated, (req, res) => {
+    const rol = obtenerRol(req);
+    if (rol === 'administrador') {
+      res.render("menuAdmin", { user: req.user });
+    } else {
+      res.status(403).send("Acceso no autorizado");
+    }
+  });
 
-// Ruta para el Dashboard (únicamente accesible para usuarios autenticados)
-router.get('/dashboard', isAuthenticated, (req, res) => {
-  const usuario = req.user as Usuario;
+  app.get("/mesero", isAuthenticated, (req, res) => {
+    const rol = obtenerRol(req);
+    if (rol === 'mesero') {
+      res.render("menuMesero", { user: req.user });
+    } else {
+      res.status(403).send("Acceso no autorizado");
+    }
+  });
 
-  // Redirigir a la vista correspondiente según el rol
-  switch (usuario.rol) {
-    case 'administrador':
-      res.render('menuAdmin', { usuario });
-      break;
-    case 'cocinero':
-      res.render('menuCocinero', { usuario });
-      break;
-    case 'mesero':
-      res.render('menuMesero', { usuario });
-      break;
-    default:
-      res.redirect('/unauthorized');  // Redirigir a página de no autorizado si el rol no es válido
-  }
-});
-
-// Rutas específicas de Administrador (solo accesible por administradores)
-router.get('/admin', isAuthenticated, authorize('administrador'), (req, res) => {
-  res.render('menuAdmin'); // Página para administradores
-});
-
-// Rutas específicas de Cocinero (solo accesible por cocineros)
-router.get('/cocinero', isAuthenticated, authorize('cocinero'), (req, res) => {
-  res.render('menuCocinero'); // Página para cocineros
-});
-
-// Rutas específicas de Mesero (solo accesible por meseros)
-router.get('/mesero', isAuthenticated, authorize('mesero'), (req, res) => {
-  res.render('menuMesero'); // Página para meseros
-});
-
-export default router;
+  app.get("/cocinero", isAuthenticated, (req, res) => {
+    const rol = obtenerRol(req);
+    if (rol === 'cocinero') {
+      res.render("menuCocinero", { user: req.user });
+    } else {
+      res.status(403).send("Acceso no autorizado");
+    }
+  });
+}

@@ -2,6 +2,7 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
 import { UsuarioModel } from './orm_auth_models';  // Asegúrate de tener el modelo correctamente importado
+import { Usuario } from './auth_types';
 
 // Configuración de la estrategia local para autenticación
 passport.use(
@@ -54,12 +55,13 @@ passport.deserializeUser(async (id: number, done) => {
       id: usuario.id,
       nombre: usuario.nombre,
       correo: usuario.correo,
-      rol: usuario.rol,  // Asegúrate de que el rol esté incluido en el objeto deserializado
+      rol: usuario.rol,  // Asegúrate de que el rol esté incluido aquí
     });
   } catch (error) {
     done(error);
   }
 });
+
 
 // Middleware para verificar si el usuario está autenticado
 export function isAuthenticated(req: any, res: any, next: any) {

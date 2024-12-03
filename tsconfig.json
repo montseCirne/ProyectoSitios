@@ -1,8 +1,9 @@
 {
     "extends": "@tsconfig/node20/tsconfig.json",
     "compilerOptions": {
+     "typeRoots": ["./node_modules/@types", "./types"],   
     "rootDir": "src/server",
     "outDir": "dist/server/"
     },
-    "include": ["src/server/**/*"]
+    "include": ["src/server/**/*", "src/server/auth/auth_types.ts"]
 }
