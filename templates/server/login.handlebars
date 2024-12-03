@@ -30,11 +30,11 @@
     document.addEventListener("DOMContentLoaded", () => {
       const userRole = "{{userRole}}"; // La variable será pasada desde el backend
       if (userRole === "mesero") {
-        window.location.href = "/mesero";
+        window.location.href = "/menuMsero";
       } else if (userRole === "cocinero") {
-        window.location.href = "/cocinero";
+        window.location.href = "/menuCocinero";
       } else if (userRole === "administrador") {
-        window.location.href = "/administrador";
+        window.location.href = "/menuAdministrador";
       }
     });
   </script>
