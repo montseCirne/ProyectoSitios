@@ -90,7 +90,12 @@ class AuthStore {
     }
     // Eliminar una comanda
     async deleteComanda(id) {
-        await exports.Comanda.destroy({ where: { id } });
+        try {
+            await exports.Comanda.destroy({ where: { id } });
+        }
+        catch (error) {
+            console.error('Error al eliminar la comanda:', error);
+        }
     }
     // Listar todas las comandas
     async listComandas() {

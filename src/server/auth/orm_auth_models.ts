@@ -100,7 +100,7 @@ ComandaModel.belongsTo(UsuarioModel, { foreignKey: 'meseroId', as: 'mesero' });
 // Sincronización
 export const initModels = async () => {
   try {
-    await sequelize.sync({ force: true }); // Usa "true" solo para desarrollo
+    await sequelize.sync(); 
     console.log('Modelos sincronizados con la base de datos.');
   } catch (error) {
     console.error('Error al sincronizar modelos:', error);
