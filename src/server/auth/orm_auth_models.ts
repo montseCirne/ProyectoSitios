@@ -7,7 +7,7 @@ export class UsuarioModel extends Model {
   declare nombre: string;
   declare correo: string;
   declare contraseña: string;
-  declare role: 'mesero' | 'cocinero' | 'administrador';
+  declare rol: 'mesero' | 'cocinero' | 'administrador';
 }
 
 UsuarioModel.init(
@@ -101,6 +101,7 @@ ComandaModel.belongsTo(UsuarioModel, { foreignKey: 'meseroId', as: 'mesero' });
 export const initModels = async () => {
   try {
     await sequelize.sync({alter: true}); 
+    console.log('Base de datos sincronizada.');
     console.log('Modelos sincronizados con la base de datos.');
   } catch (error) {
     console.error('Error al sincronizar modelos:', error);

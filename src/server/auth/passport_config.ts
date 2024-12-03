@@ -29,7 +29,7 @@ passport.use(
           id: usuario.id,
           nombre: usuario.nombre,
           correo: usuario.correo,
-          role: usuario.role,
+          rol: usuario.rol,
         });
       } catch (error) {
         return done(error);

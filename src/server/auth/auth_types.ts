@@ -3,7 +3,7 @@ export interface Usuario {
   nombre: string;
   correo: string;
   contraseña: string;
-  role: 'mesero' | 'cocinero' | 'administrador';
+  rol: 'mesero' | 'cocinero' | 'administrador';
 }
 
 export interface Mesa {

@@ -30,7 +30,7 @@ passport_1.default.use(new passport_local_1.Strategy({
             id: usuario.id,
             nombre: usuario.nombre,
             correo: usuario.correo,
-            role: usuario.role,
+            rol: usuario.rol,
         });
     }
     catch (error) {

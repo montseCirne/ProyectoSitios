@@ -74,6 +74,7 @@ ComandaModel.belongsTo(UsuarioModel, { foreignKey: 'meseroId', as: 'mesero' });
 const initModels = async () => {
     try {
         await orm_auth_store_1.sequelize.sync({ alter: true });
+        console.log('Base de datos sincronizada.');
         console.log('Modelos sincronizados con la base de datos.');
     }
     catch (error) {
