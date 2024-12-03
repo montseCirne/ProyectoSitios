@@ -52,7 +52,7 @@ passport_1.default.deserializeUser(async (id, done) => {
             id: usuario.id,
             nombre: usuario.nombre,
             correo: usuario.correo,
-            rol: usuario.rol, // Asegúrate de que el rol esté incluido en el objeto deserializado
+            rol: usuario.rol, // Asegúrate de que el rol esté incluido aquí
         });
     }
     catch (error) {

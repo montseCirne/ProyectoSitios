@@ -1,6 +1,6 @@
 import { Express } from "express";
 import passport from "passport";
-import { isAuthenticated } from "./auth/passport_config"; // Importar isAuthenticated para proteger las rutas
+import { isAuthenticated, authorize } from "./auth/passport_config"; // Importar isAuthenticated y authorize para proteger rutas
 
 function obtenerRol(req: any): string | undefined {
   return req.user ? req.user.rol : undefined;
@@ -43,30 +43,42 @@ export function registerFormRoutesUser(app: Express) {
   });
 
   // Rutas para los menús, accesibles solo para usuarios autenticados y con el rol adecuado
-  app.get("/admin", isAuthenticated, (req, res) => {
-    const rol = obtenerRol(req);
-    if (rol === 'administrador') {
-      res.render("menuAdmin", { user: req.user });
-    } else {
-      res.status(403).send("Acceso no autorizado");
-    }
+
+  // Admin - Acceso a todas las mesas, comandas, y creación de usuarios
+  app.get("/admin", isAuthenticated, authorize('administrador'), (req, res) => {
+    res.render("menuAdmin", { user: req.user });
   });
 
-  app.get("/mesero", isAuthenticated, (req, res) => {
-    const rol = obtenerRol(req);
-    if (rol === 'mesero') {
-      res.render("menuMesero", { user: req.user });
-    } else {
-      res.status(403).send("Acceso no autorizado");
-    }
+  // Admin - Crear usuario
+  app.post("/admin/crearUsuario", isAuthenticated, authorize('administrador'), (req, res) => {
+    // Aquí iría la lógica para crear usuarios
+    const { nombre, correo, contraseña, rol } = req.body;
+    // Llama a la función para crear el usuario en la base de datos
+    res.redirect("/admin");
   });
 
-  app.get("/cocinero", isAuthenticated, (req, res) => {
-    const rol = obtenerRol(req);
-    if (rol === 'cocinero') {
-      res.render("menuCocinero", { user: req.user });
-    } else {
-      res.status(403).send("Acceso no autorizado");
-    }
+  // Mesero - Acceso a las mesas y comandas
+  app.get("/mesero", isAuthenticated, authorize('mesero'), (req, res) => {
+    res.render("menuMesero", { user: req.user });
   });
+
+  // Mesero - Registrar comanda
+  app.post("/mesero/registrarComanda", isAuthenticated, authorize('mesero'), (req, res) => {
+    const { idMesa, platillos, bebidas, notas } = req.body;
+    // Llama a la función para crear la comanda en la base de datos
+    res.redirect("/mesero");
+  });
+
+  // Cocinero - Ver comandas y cambiar estado
+  app.get("/cocinero", isAuthenticated, authorize('cocinero'), (req, res) => {
+    res.render("menuCocinero", { user: req.user });
+  });
+
+  // Cocinero - Editar estado de la comanda
+  app.post("/cocinero/editarComanda", isAuthenticated, authorize('cocinero'), (req, res) => {
+    const { idComanda, estado } = req.body;
+    // Llama a la función para actualizar el estado de la comanda en la base de datos
+    res.redirect("/cocinero");
+  });
+
 }

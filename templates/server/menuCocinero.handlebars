@@ -1,0 +1,19 @@
+<h1>Bienvenido, {{user.nombre}} (Cocinero)</h1>
+<a href="/login">Cerrar sesión</a>
+
+<h2>Comandas Pendientes</h2>
+<ul>
+  {{#each comandas}}
+    <li>
+      Mesa {{this.idMesa}}: Platillos {{this.platillos}} | Estado: {{this.estado}}
+      <form action="/cocinero/comanda/{{this.id}}" method="POST">
+        <label for="estado">Actualizar estado:</label>
+        <select name="estado">
+          <option value="en preparación" {{#ifCond this.estado "en preparación"}}selected{{/ifCond}}>En preparación</option>
+          <option value="listo" {{#ifCond this.estado "listo"}}selected{{/ifCond}}>Listo</option>
+        </select>
+        <button type="submit">Actualizar</button>
+      </form>
+    </li>
+  {{/each}}
+</ul>

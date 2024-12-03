@@ -1,20 +1,40 @@
-<h1>Panel de Administración</h1>
-<h2>Usuarios</h2>
-<ul>
-  {{#each usuarios}}
-    <li>{{this.nombre}} ({{this.rol}})</li>
-  {{/each}}
-</ul>
+<h1>Bienvenido, {{user.nombre}} (Administrador)</h1>
+<a href="/login">Cerrar sesión</a>
+
 <h2>Mesas</h2>
 <ul>
   {{#each mesas}}
-    <li>Mesa {{this.numero}} - {{this.estado}}</li>
+    <li>Mesa {{this.numero}}: {{this.estado}}</li>
   {{/each}}
 </ul>
+
 <h2>Comandas</h2>
 <ul>
   {{#each comandas}}
-    <li>Mesa: {{this.idMesa}}, Estado: {{this.estado}}</li>
+    <li>Mesa {{this.idMesa}}: Platillos {{this.platillos}} | Bebidas {{this.bebidas}}</li>
   {{/each}}
 </ul>
-<a href="/logout">Cerrar sesión</a>
+
+<h2>Usuarios</h2>
+<ul>
+  {{#each usuarios}}
+    <li>{{this.nombre}} - {{this.rol}}</li>
+  {{/each}}
+</ul>
+
+<h2>Crear Usuario</h2>
+<form action="/admin/usuario" method="POST">
+  <label>Nombre:</label>
+  <input type="text" name="nombre" required>
+  <label>Correo:</label>
+  <input type="email" name="correo" required>
+  <label>Contraseña:</label>
+  <input type="password" name="contraseña" required>
+  <label>Rol:</label>
+  <select name="rol">
+    <option value="mesero">Mesero</option>
+    <option value="cocinero">Cocinero</option>
+    <option value="administrador">Administrador</option>
+  </select>
+  <button type="submit">Crear</button>
+</form>

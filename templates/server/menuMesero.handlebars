@@ -1,3 +1,26 @@
-<h1>Bienvenido, {{user.nombre}}</h1>
-<p>Este es el menú del mesero.</p>
-<a href="/logout">Cerrar sesión</a>
+<h1>Bienvenido, {{user.nombre}} (Mesero)</h1>
+<a href="/login">Cerrar sesión</a>
+
+<h2>Estado de las mesas</h2>
+<ul>
+  {{#each mesas}}
+    <li>Mesa {{this.numero}}: {{this.estado}}</li>
+  {{/each}}
+</ul>
+
+<h2>Registrar nueva comanda</h2>
+<form action="/mesero/comanda" method="POST">
+  <label for="idMesa">Mesa:</label>
+  <select name="idMesa">
+    {{#each mesas}}
+      <option value="{{this.id}}">{{this.numero}}</option>
+    {{/each}}
+  </select>
+  <label for="platillos">Platillos:</label>
+  <input type="text" name="platillos">
+  <label for="bebidas">Bebidas:</label>
+  <input type="text" name="bebidas">
+  <label for="notas">Notas (opcional):</label>
+  <textarea name="notas"></textarea>
+  <button type="submit">Enviar</button>
+</form>
