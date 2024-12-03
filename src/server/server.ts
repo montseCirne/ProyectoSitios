@@ -6,7 +6,8 @@ import { engine } from "express-handlebars";
 import passport from "passport";
 import session from "express-session";
 import path from "path";
-//import { registerFormRoutesUser } from "./rutas"; // Asumiendo que rutas.ts tiene esta función
+import { isAuthenticated, authorize } from "./auth/passport_config"; // Importar la autenticación y roles
+import { registerFormRoutesUser } from "./rutas"; // Suponiendo que las rutas de usuario se manejan aquí
 
 const port = 5000;
 const expressApp: Express = express();
@@ -39,8 +40,8 @@ expressApp.use(session({
 expressApp.use(passport.initialize());
 expressApp.use(passport.session());
 
-// Rutas para formularios de usuario
-//registerFormRoutesUser(expressApp);
+// Rutas para formularios de usuario (registrar, login, etc.)
+registerFormRoutesUser(expressApp);
 
 // Servir archivos estáticos como CSS y JS desde la carpeta "static"
 expressApp.use(express.static(path.join(__dirname, "../../static")));
@@ -69,7 +70,18 @@ expressApp.use(express.static(path.join(__dirname, "../../node_modules/bootstrap
 // Redirigir la raíz a la página de login
 expressApp.get("^/$", (req, res) => res.redirect("/login"));
 
-// Configurar el proxy para todas las demás solicitudes
+// Configurar rutas de usuario según los roles
+expressApp.get("/admin", isAuthenticated, authorize("administrador"), (req, res) => {
+    res.render("menuAdmin");
+});
+expressApp.get("/cocinero", isAuthenticated, authorize("cocinero"), (req, res) => {
+    res.render("menuCocinero");
+});
+expressApp.get("/mesero", isAuthenticated, authorize("mesero"), (req, res) => {
+    res.render("menuMesero");
+});
+
+// Configuración del proxy para todas las demás solicitudes
 expressApp.use((req, res) => {
     proxy.web(req, res);
 });
