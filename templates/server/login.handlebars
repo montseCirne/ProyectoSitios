@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar Sesión</title>
-  <link rel="stylesheet" href="/css/styles.css"> <!-- Agrega tu archivo de estilos -->
 </head>
 <body>
   <div class="login-container">
@@ -24,19 +23,5 @@
       <p class="error">{{error}}</p>
     {{/if}}
   </div>
-
-  <script>
-    // Redirige al usuario según su rol después de iniciar sesión
-    document.addEventListener("DOMContentLoaded", () => {
-      const userRole = "{{userRole}}"; // La variable será pasada desde el backend
-      if (userRole === "mesero") {
-        window.location.href = "/menuMsero";
-      } else if (userRole === "cocinero") {
-        window.location.href = "/menuCocinero";
-      } else if (userRole === "administrador") {
-        window.location.href = "/menuAdministrador";
-      }
-    });
-  </script>
 </body>
 </html>
