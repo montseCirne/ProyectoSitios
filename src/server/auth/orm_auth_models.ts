@@ -16,7 +16,7 @@ UsuarioModel.init(
     nombre: { type: DataTypes.STRING, allowNull: false },
     correo: { type: DataTypes.STRING, allowNull: false, unique: true },
     contraseña: { type: DataTypes.STRING, allowNull: false },
-    role: { type: DataTypes.ENUM('mesero', 'cocinero', 'administrador'), allowNull: false },
+    rol: { type: DataTypes.ENUM('mesero', 'cocinero', 'administrador'), allowNull: false },
   },
   {
     sequelize,

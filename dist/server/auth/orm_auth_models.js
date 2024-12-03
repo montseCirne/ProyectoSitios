@@ -12,7 +12,7 @@ UsuarioModel.init({
     nombre: { type: sequelize_1.DataTypes.STRING, allowNull: false },
     correo: { type: sequelize_1.DataTypes.STRING, allowNull: false, unique: true },
     contraseña: { type: sequelize_1.DataTypes.STRING, allowNull: false },
-    role: { type: sequelize_1.DataTypes.ENUM('mesero', 'cocinero', 'administrador'), allowNull: false },
+    rol: { type: sequelize_1.DataTypes.ENUM('mesero', 'cocinero', 'administrador'), allowNull: false },
 }, {
     sequelize: orm_auth_store_1.sequelize,
     modelName: 'Usuario',
