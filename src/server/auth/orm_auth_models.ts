@@ -91,14 +91,16 @@ ComandaModel.init(
 );
 
 // Relaciones
-MesaModel.hasMany(ComandaModel, { foreignKey: 'idMesa', as: 'comandas' });
+MesaModel.hasMany(ComandaModel, { foreignKey: 'idMesa', as: 'comandas', onDelete: 'CASCADE' });
 ComandaModel.belongsTo(MesaModel, { foreignKey: 'idMesa', as: 'mesa' });
-UsuarioModel.hasMany(ComandaModel, { foreignKey: 'meseroId', as: 'comandas' });
+
+UsuarioModel.hasMany(ComandaModel, { foreignKey: 'meseroId', as: 'comandas', onDelete: 'CASCADE' });
+ComandaModel.belongsTo(UsuarioModel, { foreignKey: 'meseroId', as: 'mesero' });
 
 // Sincronización
 export const initModels = async () => {
   try {
-    await sequelize.sync({ force: false }); // Usa "true" solo para desarrollo
+    await sequelize.sync({ force: true }); // Usa "true" solo para desarrollo
     console.log('Modelos sincronizados con la base de datos.');
   } catch (error) {
     console.error('Error al sincronizar modelos:', error);

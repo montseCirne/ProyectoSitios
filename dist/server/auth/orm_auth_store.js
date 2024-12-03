@@ -10,6 +10,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.sequelize = new sequelize_1.Sequelize({
     dialect: 'sqlite',
     storage: 'restaurante.bd',
+    logging: console.log,
 });
 // Modelo de Usuario
 exports.Usuario = exports.sequelize.define('Usuario', {
@@ -42,6 +43,7 @@ exports.Comanda = exports.sequelize.define('Comanda', {
             model: exports.Usuario,
             key: 'id',
         },
+        onDelete: 'CASCADE',
     },
 });
 class AuthStore {

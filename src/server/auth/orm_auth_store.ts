@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 export const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: 'restaurante.bd',
+  logging: console.log,
 });
 
 // Modelo de Usuario
@@ -40,6 +41,7 @@ export const Comanda = sequelize.define('Comanda', {
       model: Usuario,
       key: 'id',
     },
+    onDelete: 'CASCADE',
   },
 });
 
