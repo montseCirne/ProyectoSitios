@@ -15,7 +15,7 @@ export interface Mesa {
 export interface Comanda {
   id: number;
   idMesa: number;
-  idMesero: number; // Relación con el mesero que crea la comanda
+  meseroId: number; // Relación con el mesero que crea la comanda
   platillos: string[];
   bebidas: string[];
   notas?: string;

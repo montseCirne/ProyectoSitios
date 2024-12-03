@@ -55,7 +55,7 @@ export class ComandaModel extends Model {
   declare bebidas: string[];
   declare notas?: string;
   declare estado: 'pendiente' | 'en preparación' | 'listo';
-  declare meseroId: number; // Referencia al mesero
+  declare meseroId: number; // Relación con el mesero
 }
 
 ComandaModel.init(
