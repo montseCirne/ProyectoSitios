@@ -103,18 +103,24 @@ class AuthStore {
     }
     // Inicializar la base de datos con datos por defecto
     async initModelAndDatabase() {
-        await exports.sequelize.truncate({ cascade: true }); // Elimina datos pero no tablas
-        // Usuarios por defecto
-        await this.storeOrUpdateUser('Erik', 'eriklopez@gmail.com', '1234', 'mesero');
-        await this.storeOrUpdateUser('Eber', 'eber@gmail.com', 'mysecret', 'cocinero');
-        await this.storeOrUpdateUser('Tiberio', 'tibi@gmail.com', 'mysecret', 'administrador');
-        // Mesas por defecto
-        const defaultTables = [];
-        for (let i = 1; i <= 10; i++) {
-            defaultTables.push(this.storeOrUpdateTable(i, 'disponible'));
+        try {
+            await exports.sequelize.sync({ alter: true }); // Sincroniza las tablas, pero no borra datos
+            console.log('Modelos sincronizados con la base de datos.');
+            // Inicializar datos por defecto
+            await this.storeOrUpdateUser('Erik', 'eriklopez@gmail.com', '1234', 'mesero');
+            await this.storeOrUpdateUser('Eber', 'eber@gmail.com', 'mysecret', 'cocinero');
+            await this.storeOrUpdateUser('Tiberio', 'tibi@gmail.com', 'mysecret', 'administrador');
+            // Inicialización de mesas por defecto
+            const defaultTables = [];
+            for (let i = 1; i <= 10; i++) {
+                defaultTables.push(this.storeOrUpdateTable(i, 'disponible'));
+            }
+            await Promise.all(defaultTables);
+            console.log('Base de datos inicializada con usuarios y mesas por defecto.');
         }
-        await Promise.all(defaultTables);
-        console.log('Base de datos inicializada con usuarios y mesas por defecto.');
+        catch (error) {
+            console.error('Error al sincronizar o inicializar la base de datos:', error);
+        }
     }
 }
 exports.AuthStore = AuthStore;

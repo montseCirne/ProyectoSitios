@@ -8,7 +8,13 @@ import session from "express-session";
 import path from "path";
 import { isAuthenticated, authorize } from "./auth/passport_config"; // Importar la autenticación y roles
 import { registerFormRoutesUser } from "./rutas"; // Suponiendo que las rutas de usuario se manejan aquí
+import { sequelize } from './auth/orm_auth_store';
 
+sequelize.sync({ force: false }).then(() => {
+    console.log('Base de datos sincronizada');
+}).catch((err) => {
+    console.error('Error al sincronizar la base de datos:', err);
+});
 const port = 5000;
 const expressApp: Express = express();
 

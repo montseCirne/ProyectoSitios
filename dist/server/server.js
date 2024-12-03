@@ -13,6 +13,12 @@ const express_session_1 = __importDefault(require("express-session"));
 const path_1 = __importDefault(require("path"));
 const passport_config_1 = require("./auth/passport_config"); // Importar la autenticación y roles
 const rutas_1 = require("./rutas"); // Suponiendo que las rutas de usuario se manejan aquí
+const orm_auth_store_1 = require("./auth/orm_auth_store");
+orm_auth_store_1.sequelize.sync({ force: false }).then(() => {
+    console.log('Base de datos sincronizada');
+}).catch((err) => {
+    console.error('Error al sincronizar la base de datos:', err);
+});
 const port = 5000;
 const expressApp = (0, express_1.default)();
 // Configuración del proxy
