@@ -44,10 +44,18 @@ passport.serializeUser((user: any, done) => {
 });
 
 // Deserialización del usuario de la sesión
-passport.deserializeUser(async (id: string, done) => {
+passport.deserializeUser(async (id: number, done) => {
   try {
     const usuario = await UsuarioModel.findByPk(id);
-    done(null, usuario);
+    if (!usuario) {
+      return done(null, false);
+    }
+    done(null, {
+      id: usuario.id,
+      nombre: usuario.nombre,
+      correo: usuario.correo,
+      rol: usuario.rol,  // Asegúrate de que el rol esté incluido en el objeto deserializado
+    });
   } catch (error) {
     done(error);
   }
@@ -64,7 +72,7 @@ export function isAuthenticated(req: any, res: any, next: any) {
 // Middleware para verificar si el usuario tiene el rol adecuado
 export function authorize(role: 'mesero' | 'cocinero' | 'administrador') {
   return (req: any, res: any, next: any) => {
-    if (req.isAuthenticated() && req.user.role === role) {
+    if (req.isAuthenticated() && req.user.rol === role) {
       return next();
     }
     res.status(403).json({ error: 'No autorizado' });

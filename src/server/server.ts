@@ -6,15 +6,8 @@ import { engine } from "express-handlebars";
 import passport from "passport";
 import session from "express-session";
 import path from "path";
-import { isAuthenticated, authorize } from "./auth/passport_config"; // Importar la autenticación y roles
-import { registerFormRoutesUser } from "./rutas"; // Suponiendo que las rutas de usuario se manejan aquí
-import { sequelize } from './auth/orm_auth_store';
+import rutas from './rutas';  // Importar las rutas
 
-sequelize.sync({ force: false }).then(() => {
-    console.log('Base de datos sincronizada');
-}).catch((err) => {
-    console.error('Error al sincronizar la base de datos:', err);
-});
 const port = 5000;
 const expressApp: Express = express();
 
@@ -46,46 +39,11 @@ expressApp.use(session({
 expressApp.use(passport.initialize());
 expressApp.use(passport.session());
 
-// Rutas para formularios de usuario (registrar, login, etc.)
-registerFormRoutesUser(expressApp);
-
 // Servir archivos estáticos como CSS y JS desde la carpeta "static"
 expressApp.use(express.static(path.join(__dirname, "../../static")));
 
-// Rutas específicas para servir archivos CSS y JS
-expressApp.get('/static/styles.css', (req, res) => {
-    res.type('application/css');
-    res.sendFile(path.join(__dirname, "../../static/styles.css"));
-});
-
-expressApp.use(express.static(path.join(__dirname, "../../src/client")));
-expressApp.get('/src/client/client.js', (req, res) => {
-    res.type('application/javascript');
-    res.sendFile(path.join(__dirname, "../../src/client/client.js"));
-});
-
-// Política de seguridad de contenido (CSP)
-expressApp.use((req, res, next) => {
-    res.setHeader("Content-Security-Policy", "script-src 'self' https://cdn.jsdelivr.net;");
-    next();
-});
-
-// Servir Bootstrap desde node_modules
-expressApp.use(express.static(path.join(__dirname, "../../node_modules/bootstrap/dist")));
-
-// Redirigir la raíz a la página de login
-expressApp.get("^/$", (req, res) => res.redirect("/login"));
-
-// Configurar rutas de usuario según los roles
-expressApp.get("/admin", isAuthenticated, authorize("administrador"), (req, res) => {
-    res.render("menuAdmin");
-});
-expressApp.get("/cocinero", isAuthenticated, authorize("cocinero"), (req, res) => {
-    res.render("menuCocinero");
-});
-expressApp.get("/mesero", isAuthenticated, authorize("mesero"), (req, res) => {
-    res.render("menuMesero");
-});
+// Redirigir la raíz a la página de login si no está autenticado
+expressApp.use(rutas); // Usar las rutas importadas de rutas.ts
 
 // Configuración del proxy para todas las demás solicitudes
 expressApp.use((req, res) => {
